@@ -1,0 +1,933 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Interactive starter course for new test engineers on the Advantest V93000 Smart Scale, Pin Scale 1600 card and SmarTest 8.">
+<style>
+html{color-scheme:light dark}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+@media (max-width:860px){.rail .note.tm{display:block;margin-top:10px;font-size:.75rem}}
+</style>
+<title>PS1600 Starter Course</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: lesson rail on the left (top strip on phones), one lesson at a time in a reading column; diagrams and labs sit in "bench" panels like instrument fronts. */
+:root{
+  --bg:#f3f5f8; --surface:#ffffff; --bench:#e8edf3; --ink:#18212e; --muted:#566275; --line:#cfd7e2;
+  --accent:#1d5fd1; --accent-ink:#ffffff; --accent-soft:#dde8fb;
+  --pass:#13804a; --pass-soft:#d9f1e3; --fail:#c2352b; --fail-soft:#f8dedb; --warn:#a96400; --warn-soft:#fbecd2;
+  --sig1:#1d5fd1; --sig2:#b4520a; --grid:#d9e0ea;
+  --f-display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f141c; --surface:#161d28; --bench:#1c2533; --ink:#e4e9f1; --muted:#9aa6b8; --line:#2c3748;
+  --accent:#6ea0ff; --accent-ink:#0b1220; --accent-soft:#1d2c48;
+  --pass:#4cc98a; --pass-soft:#143324; --fail:#ff7a6e; --fail-soft:#3a1c1a; --warn:#f0ad4e; --warn-soft:#3a2a12;
+  --sig1:#6ea0ff; --sig2:#f39a52; --grid:#263142; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f141c; --surface:#161d28; --bench:#1c2533; --ink:#e4e9f1; --muted:#9aa6b8; --line:#2c3748;
+  --accent:#6ea0ff; --accent-ink:#0b1220; --accent-soft:#1d2c48;
+  --pass:#4cc98a; --pass-soft:#143324; --fail:#ff7a6e; --fail-soft:#3a1c1a; --warn:#f0ad4e; --warn-soft:#3a2a12;
+  --sig1:#6ea0ff; --sig2:#f39a52; --grid:#263142; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.6}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+.shell{display:grid;grid-template-columns:270px minmax(0,1fr);min-height:100vh}
+/* rail */
+.rail{background:var(--surface);border-right:1px solid var(--line);padding-block:24px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:16px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{font-family:var(--f-display);font-stretch:80%;font-weight:800;font-size:1.25rem;letter-spacing:.01em;line-height:1.1}
+.brand small{display:block;font-family:var(--f-mono);font-weight:400;font-size:.68rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:6px;font-stretch:100%}
+.progress{margin:20px 0 14px}
+.progress .bar{height:6px;background:var(--bench);border-radius:3px;overflow:hidden}
+.progress .bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.progress .lbl{font-family:var(--f-mono);font-size:.72rem;color:var(--muted);margin-top:6px}
+.nav{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.nav button{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:28px 1fr 16px;align-items:center;gap:6px;width:100%;padding:7px 8px;border-radius:6px;font-size:.93rem;line-height:1.3;color:var(--ink)}
+.nav button:hover{background:var(--bench)}
+.nav button[aria-current="true"]{background:var(--accent-soft);font-weight:600}
+.nav .n{font-family:var(--f-mono);font-size:.75rem;color:var(--muted)}
+.nav .ck{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--line)}
+.nav .done .ck{background:var(--pass);border-color:var(--pass)}
+.rail .note{font-size:.8rem;color:var(--muted);margin-top:22px;line-height:1.45}
+/* main */
+main{padding-block:40px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.lesson{max-width:780px;margin:0 auto}
+.eyebrow{font-family:var(--f-mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.15}
+h1{font-size:clamp(2rem,4.5vw,2.75rem);font-stretch:82%;font-weight:800;margin:.25em 0 .4em}
+h2{font-size:1.45rem;font-stretch:88%;font-weight:700;margin:2em 0 .5em}
+h3{font-size:1.1rem;font-weight:700;margin:1.5em 0 .4em}
+p,li{max-width:68ch}
+.lede{font-size:1.15rem;color:var(--muted)}
+code{font-family:var(--f-mono);font-size:.86em;background:var(--bench);padding:1px 5px;border-radius:4px}
+pre{font-family:var(--f-mono);font-size:.82rem;line-height:1.55;background:var(--bench);border:1px solid var(--line);border-radius:8px;padding:16px;overflow-x:auto;margin:0}
+pre code{background:none;padding:0;font-size:inherit}
+.codecap{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-family:var(--f-mono);font-size:.72rem;color:var(--muted);margin:22px 0 6px}
+.codecap .tag{color:var(--warn)}
+.c-k{color:var(--accent)} .c-c{color:var(--muted);font-style:italic} .c-s{color:var(--sig2)}
+.bench{background:var(--bench);border:1px solid var(--line);border-radius:10px;padding:18px;margin:22px 0}
+.bench h4{margin:0 0 10px;font-family:var(--f-mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.svgwrap{overflow-x:auto}
+.svgwrap svg{display:block;width:100%;min-width:560px;height:auto}
+.svgwrap svg text{font-family:var(--f-body)}
+.callout{border-left:3px solid var(--warn);background:var(--warn-soft);padding:12px 16px;border-radius:0 8px 8px 0;margin:20px 0;font-size:.95rem}
+.callout.info{border-color:var(--accent);background:var(--accent-soft)}
+.callout b{display:block;font-family:var(--f-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
+.tablewrap{overflow-x:auto;margin:18px 0}
+table{border-collapse:collapse;width:100%;font-size:.93rem;min-width:520px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+td.num{font-variant-numeric:tabular-nums;font-family:var(--f-mono);font-size:.85rem;white-space:nowrap}
+.specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:18px 0}
+.spec{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.spec .v{font-family:var(--f-display);font-stretch:82%;font-weight:800;font-size:1.6rem;line-height:1.1}
+.spec .k{font-size:.82rem;color:var(--muted)}
+.steps{counter-reset:s;list-style:none;padding:0;display:flex;flex-direction:column;gap:10px}
+.steps li{counter-increment:s;display:grid;grid-template-columns:30px 1fr;gap:10px}
+.steps li::before{content:counter(s);font-family:var(--f-mono);font-size:.78rem;font-weight:600;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;margin-top:2px}
+.tree{font-family:var(--f-mono);font-size:.82rem;line-height:1.7;white-space:pre;overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.tree .d{color:var(--muted)}
+/* controls */
+.ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px 18px;margin-top:14px}
+.ctl label{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--muted)}
+.ctl output{font-family:var(--f-mono);color:var(--ink);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{font:inherit;font-size:.88rem;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:6px 12px;border-radius:999px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.verdict{display:inline-flex;align-items:center;gap:8px;font-family:var(--f-mono);font-weight:600;font-size:.85rem;padding:5px 12px;border-radius:999px;margin-top:12px}
+.verdict.pass{background:var(--pass-soft);color:var(--pass)} .verdict.fail{background:var(--fail-soft);color:var(--fail)}
+.readout{font-size:.92rem;color:var(--muted);margin-top:8px}
+/* quiz */
+.quiz{border-top:2px solid var(--ink);margin-top:48px;padding-top:18px}
+.quiz h2{margin-top:0}
+.q{margin:18px 0 22px}
+.q p{font-weight:600;margin:0 0 8px}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opts button{font:inherit;font-size:.95rem;text-align:left;cursor:pointer;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:9px 12px}
+.opts button:hover:not(:disabled){border-color:var(--accent)}
+.opts button.right{border-color:var(--pass);background:var(--pass-soft)}
+.opts button.wrong{border-color:var(--fail);background:var(--fail-soft)}
+.opts button:disabled{cursor:default}
+.why{font-size:.9rem;color:var(--muted);margin-top:8px}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:40px;flex-wrap:wrap}
+.btn{font:inherit;font-weight:600;cursor:pointer;border-radius:8px;padding:10px 16px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn[hidden]{display:none}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:16px 0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.card h3{margin:0 0 4px;font-size:1rem}
+.card p{margin:0;font-size:.92rem;color:var(--muted)}
+dl.gloss{display:grid;grid-template-columns:minmax(120px,190px) 1fr;gap:8px 18px;margin:16px 0}
+dl.gloss dt{font-family:var(--f-mono);font-size:.85rem;font-weight:600}
+dl.gloss dd{margin:0;font-size:.95rem}
+@media (max-width:860px){
+  .shell{grid-template-columns:1fr}
+  .rail{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .nav{flex-direction:row;overflow-x:auto;gap:4px;padding-bottom:4px}
+  .nav button{grid-template-columns:auto auto;width:auto;white-space:nowrap}
+  .nav .t,.rail .note{display:none}
+  .nav .ck{display:none}
+  .nav button{grid-template-columns:auto}
+  .nav .done .n{color:var(--pass);font-weight:600}
+  main{padding-block:24px 60px}
+  dl.gloss{grid-template-columns:1fr} dl.gloss dd{margin-bottom:8px}
+}
+.flow{fill:none;stroke:var(--pass);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0 18;animation:flow 1s linear infinite}
+.flow.rev{animation-direction:reverse}
+@keyframes flow{from{stroke-dashoffset:18}to{stroke-dashoffset:0}}
+#slab.paused .flow{animation-play-state:paused}
+.flowbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:12px}
+.flowbar .readout{margin:0}
+.btn.small{font-size:.85rem;padding:6px 12px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.flow{animation:none}}
+</style>
+</head>
+<body>
+
+
+<div class="shell">
+  <aside class="rail">
+    <div class="brand">PS1600 Starter Course<small>V93000 Smart Scale · SmarTest 8</small></div>
+    <div class="progress"><div class="bar"><i id="pbar"></i></div><div class="lbl" id="plbl">0 of 10 lessons done</div></div>
+    <ul class="nav" id="nav"></ul>
+    <p class="note">For new test engineers. Built from public Advantest material and general V93000 practice. Your site's TDC manuals and test programs are the authority for exact syntax and procedures.</p>
+    <p class="note tm">V93000, Smart Scale, Pin Scale and SmarTest are trademarks of Advantest Corporation. This is an independent learning resource and is not affiliated with or endorsed by Advantest.</p>
+  </aside>
+  <main><div class="lesson" id="lesson"></div></main>
+</div>
+
+<!-- ============ LESSON CONTENT ============ -->
+<template data-id="start" data-title="Start here">
+  <div class="eyebrow">Lesson 0 · Orientation</div>
+  <h1>Your first week on the V93000</h1>
+  <p class="lede">This course walks a new test engineer from "what is that big machine" to writing and debugging a basic digital and DC test on a Smart Scale system with Pin Scale 1600 cards, using SmarTest 8.</p>
+  <h2>What you will be able to do</h2>
+  <div class="grid2">
+    <div class="card"><h3>Explain the system</h3><p>Name the main parts of a V93000 Smart Scale tester and what each card does.</p></div>
+    <div class="card"><h3>Read a PS1600 channel</h3><p>Describe what one digital channel can force, drive, compare and measure.</p></div>
+    <div class="card"><h3>Build a test program</h3><p>Set up pins, levels, timing, patterns, test suites and a test flow in SmarTest 8.</p></div>
+    <div class="card"><h3>Test and debug</h3><p>Run continuity, leakage and functional tests, and work through common failures.</p></div>
+  </div>
+  <h2>How the course works</h2>
+  <ul>
+    <li>Ten short lessons. Each ends with a two- or three-question check. Answer all questions in a lesson to mark it done.</li>
+    <li>Interactive "bench" panels let you move sliders and see how timing and DC limits behave.</li>
+    <li>Your progress is saved in this browser only.</li>
+  </ul>
+  <div class="callout"><b>Read this first</b>Code and file samples in this course are <strong>illustrative</strong>. They show the shape of a SmarTest 8 program, but class names, method names and file syntax change between releases. Check exact APIs in the SmarTest 8 documentation that ships with your tester (TDC) or with your team's existing programs before you copy anything.</div>
+  <h2>What you should already know</h2>
+  <p>Advantest lists the same prerequisites for its own SmarTest 8 Basic User Training: basic semiconductor test concepts, some Linux, and Java (or C++) programming. If Java is new to you, a few hours on classes, methods and fields is enough to follow Lesson 6.</p>
+  <div class="quiz" data-quiz>
+    <h2>Quick check</h2>
+    <div class="q" data-answer="1" data-why="SmarTest 8 test methods are written in Java. SmarTest 7 used C++."><p>Which language are SmarTest 8 test methods written in?</p><div class="opts"><button>C++</button><button>Java</button><button>Python</button></div></div>
+    <div class="q" data-answer="2" data-why="The documentation for your installed software release is the authority. Course samples are illustrative."><p>A code sample in this course doesn't compile on your tester. What is the right source to check?</p><div class="opts"><button>A forum post</button><button>An older SmarTest 7 manual</button><button>The SmarTest 8 docs for your installed release (TDC)</button></div></div>
+  </div>
+</template>
+
+<template data-id="system" data-title="The Smart Scale system">
+  <div class="eyebrow">Lesson 1 · Architecture</div>
+  <h1>The V93000 Smart Scale system</h1>
+  <p class="lede">The V93000 is a modular SoC tester. You build a system by filling a test head with instrument cards, then connect your device through a load board.</p>
+  <h2>The big picture</h2>
+  <div class="bench"><h4>Signal path from workstation to device</h4>
+  <div class="svgwrap"><svg viewBox="0 0 760 300" role="img" aria-label="Block diagram: workstation connects to test head; test head holds digital, power and analog cards; cards connect through pogo interface to load board and DUT">
+    <g fill="none" stroke="var(--line)" stroke-width="1.5">
+      <rect x="10" y="110" width="140" height="80" rx="8" fill="var(--surface)"/>
+      <rect x="200" y="20" width="330" height="260" rx="10" fill="var(--surface)"/>
+      <rect x="220" y="60" width="290" height="44" rx="6" fill="var(--accent-soft)" stroke="var(--accent)"/>
+      <rect x="220" y="114" width="290" height="44" rx="6" fill="var(--bench)"/>
+      <rect x="220" y="168" width="290" height="44" rx="6" fill="var(--bench)"/>
+      <rect x="220" y="222" width="290" height="44" rx="6" fill="var(--bench)"/>
+      <rect x="580" y="60" width="26" height="206" rx="4" fill="var(--bench)"/>
+      <rect x="630" y="90" width="120" height="146" rx="8" fill="var(--surface)"/>
+      <rect x="660" y="140" width="60" height="46" rx="4" fill="var(--accent-soft)" stroke="var(--accent)"/>
+    </g>
+    <g stroke="var(--accent)" stroke-width="2" fill="none"><path d="M150 150 H200"/><path d="M510 82 H580"/><path d="M510 136 H580"/><path d="M510 190 H580"/><path d="M510 244 H580"/><path d="M606 163 H630"/></g>
+    <g fill="var(--ink)" font-size="14">
+      <text x="80" y="145" text-anchor="middle" font-weight="700">Workstation</text>
+      <text x="80" y="165" text-anchor="middle" font-size="12" fill="var(--muted)">Linux · SmarTest 8</text>
+      <text x="365" y="44" text-anchor="middle" font-weight="700">Test head</text>
+      <text x="232" y="87">Digital: Pin Scale 1600 cards</text>
+      <text x="232" y="141">Power: DC Scale DPS / VI cards</text>
+      <text x="232" y="195">Analog / RF: e.g. MB-AV8 PLUS</text>
+      <text x="232" y="249">Utility lines, sync, clocks</text>
+      <text x="593" y="290" text-anchor="middle" font-size="12" fill="var(--muted)">Pogo interface</text>
+      <text x="690" y="115" text-anchor="middle" font-weight="700">Load board</text>
+      <text x="690" y="168" text-anchor="middle" font-size="13">DUT</text>
+      <text x="690" y="220" text-anchor="middle" font-size="12" fill="var(--muted)">socket or probe card</text>
+    </g>
+  </svg></div></div>
+  <h2>The parts, one by one</h2>
+  <div class="tablewrap"><table>
+    <tr><th>Part</th><th>What it does</th></tr>
+    <tr><td><b>Workstation</b></td><td>A Linux computer running SmarTest 8. You write, run and debug programs here.</td></tr>
+    <tr><td><b>Test head</b></td><td>Holds the instrument cards close to the device. Smart Scale heads come in sizes; the A-Class is the smallest, and C-Class and L-Class heads hold more cards and pins.</td></tr>
+    <tr><td><b>Pin Scale 1600 (PS1600)</b></td><td>The main digital card of the Smart Scale generation. Drives and compares logic signals and makes per-pin DC measurements.</td></tr>
+    <tr><td><b>DC Scale cards</b></td><td>Device power supplies (DPS) and voltage/current (VI) sources, such as the DPS128 or VI32, for supply pins and higher-current needs.</td></tr>
+    <tr><td><b>Analog and RF cards</b></td><td>Arbitrary waveform generators, digitizers and RF instruments for mixed-signal and wireless devices.</td></tr>
+    <tr><td><b>Load board</b></td><td>Your product-specific board. It routes tester channels to the device socket (final test) or probe card (wafer sort) and carries relays and components.</td></tr>
+  </table></div>
+  <h2>Per-pin architecture</h2>
+  <p>The defining idea of the V93000 is that <strong>every pin has its own resources</strong>: its own sequencer, timing and DC hardware. Advantest describes each Smart Scale pin as running its own sequencer program, with the test processor keeping digital, power and analog cards synchronized.</p>
+  <p>For you this means two practical things. Any PS1600 channel can be used for any digital signal, so the load board designer has freedom in pin assignment. And different pins can run at different rates at the same time, which is what makes high multi-site testing efficient.</p>
+  <div class="callout info"><b>Platform history</b>The PS1600 was introduced in 2011 by Verigy (later part of Advantest) with the Smart Scale generation. The newer EXA Scale generation (Pin Scale 5000) stays compatible with Smart Scale cards and load boards, so PS1600 skills carry forward.</div>
+  <div class="quiz" data-quiz>
+    <h2>Check your understanding</h2>
+    <div class="q" data-answer="0" data-why="The load board is product-specific and routes tester channels to the socket or probe card."><p>Which part is designed specifically for your product?</p><div class="opts"><button>Load board</button><button>Test head</button><button>PS1600 card</button></div></div>
+    <div class="q" data-answer="2" data-why="Per-pin architecture gives each pin its own sequencer, timing and DC resources."><p>What does "per-pin architecture" mean?</p><div class="opts"><button>Each card serves only one pin</button><button>All pins share one central timing generator</button><button>Each pin has its own sequencer, timing and DC resources</button></div></div>
+    <div class="q" data-answer="1" data-why="Device supplies go to DC Scale power cards. PS1600 per-pin DC is for low-current signal-pin measurements."><p>Your device needs 800 mA on its core supply. Where does that come from?</p><div class="opts"><button>A PS1600 channel</button><button>A DC Scale power supply card</button><button>The load board's relay</button></div></div>
+  </div>
+</template>
+
+<template data-id="card" data-title="Inside the PS1600">
+  <div class="eyebrow">Lesson 2 · Hardware</div>
+  <h1>Inside the Pin Scale 1600 card</h1>
+  <p class="lede">One PS1600 card gives you 128 digital channels. Each channel is a small, complete instrument.</p>
+  <div class="specs">
+    <div class="spec"><div class="v">128</div><div class="k">digital channels per card</div></div>
+    <div class="spec"><div class="v">1.6 Gbit/s</div><div class="k">maximum data rate per pin</div></div>
+    <div class="spec"><div class="v">DC – 1.6G</div><div class="k">usable rate range</div></div>
+    <div class="spec"><div class="v">Per pin</div><div class="k">clock domain, sequencer and DC</div></div>
+  </div>
+  <h2>One channel, opened up</h2>
+  <div class="bench"><h4>Simplified PS1600 channel</h4>
+  <div class="svgwrap"><svg viewBox="0 0 760 330" role="img" aria-label="One channel: sequencer and vector memory feed formatter and driver; comparator feeds fail capture; PPMU connects to the same pin; all join at the DUT pin">
+    <g stroke="var(--line)" stroke-width="1.5">
+      <rect x="10" y="30" width="150" height="70" rx="6" fill="var(--surface)"/>
+      <rect x="10" y="130" width="150" height="70" rx="6" fill="var(--surface)"/>
+      <rect x="200" y="30" width="150" height="70" rx="6" fill="var(--surface)"/>
+      <rect x="390" y="30" width="130" height="70" rx="6" fill="var(--accent-soft)" stroke="var(--accent)"/>
+      <rect x="390" y="130" width="130" height="70" rx="6" fill="var(--accent-soft)" stroke="var(--accent)"/>
+      <rect x="200" y="130" width="150" height="70" rx="6" fill="var(--surface)"/>
+      <rect x="390" y="240" width="130" height="70" rx="6" fill="var(--warn-soft)" stroke="var(--warn)"/>
+      <circle cx="680" cy="165" r="30" fill="var(--surface)"/>
+    </g>
+    <g stroke="var(--accent)" stroke-width="2" fill="none">
+      <path d="M160 65 H200"/><path d="M350 65 H390"/><path d="M520 65 H600 V165 H650"/>
+      <path d="M650 165 H600"/><path d="M600 165 H520"/><path d="M390 165 H350"/>
+    </g>
+    <g stroke="var(--warn)" stroke-width="2" fill="none"><path d="M520 275 H600 V165"/></g>
+    <g stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 4" fill="none"><path d="M85 100 V130"/><path d="M160 165 H200"/></g>
+    <g font-size="14" fill="var(--ink)">
+      <text x="85" y="62" text-anchor="middle" font-weight="700">Sequencer</text><text x="85" y="82" text-anchor="middle" font-size="12" fill="var(--muted)">per-pin program</text>
+      <text x="85" y="162" text-anchor="middle" font-weight="700">Vector memory</text><text x="85" y="182" text-anchor="middle" font-size="12" fill="var(--muted)">drive + expect data</text>
+      <text x="275" y="62" text-anchor="middle" font-weight="700">Timing / format</text><text x="275" y="82" text-anchor="middle" font-size="12" fill="var(--muted)">edges per period</text>
+      <text x="455" y="62" text-anchor="middle" font-weight="700">Driver</text><text x="455" y="82" text-anchor="middle" font-size="12" fill="var(--muted)">VIH / VIL</text>
+      <text x="455" y="162" text-anchor="middle" font-weight="700">Comparator</text><text x="455" y="182" text-anchor="middle" font-size="12" fill="var(--muted)">VOH / VOL</text>
+      <text x="275" y="162" text-anchor="middle" font-weight="700">Fail capture</text><text x="275" y="182" text-anchor="middle" font-size="12" fill="var(--muted)">pass/fail per cycle</text>
+      <text x="455" y="272" text-anchor="middle" font-weight="700">PPMU</text><text x="455" y="292" text-anchor="middle" font-size="12" fill="var(--muted)">force V/I, measure</text>
+      <text x="680" y="170" text-anchor="middle" font-weight="700" font-size="13">DUT pin</text>
+      <text x="610" y="110" font-size="12" fill="var(--muted)">active load</text><text x="610" y="124" font-size="12" fill="var(--muted)">and clamps also</text><text x="610" y="138" font-size="12" fill="var(--muted)">sit at the pin</text>
+    </g>
+  </svg></div></div>
+  <h3>The blocks</h3>
+  <ul>
+    <li><strong>Driver</strong> pushes a logic high (VIH) or low (VIL) into the device input, or switches off (high impedance) so the device can drive.</li>
+    <li><strong>Comparator</strong> checks the device's output against thresholds (VOH for high, VOL for low) at a strobe time you set.</li>
+    <li><strong>Active load</strong> sinks or sources a set current at a set voltage, used for loading outputs and tri-state checks.</li>
+    <li><strong>Per-pin DC unit (PPMU)</strong> forces a voltage and measures current, or forces a current and measures voltage, directly on the pin. This is what you use for continuity and leakage tests in Lesson 7.</li>
+    <li><strong>Sequencer and vector memory</strong> hold the pattern data and the per-pin program that steps through it.</li>
+  </ul>
+  <h2>Features you will hear about</h2>
+  <div class="tablewrap"><table>
+    <tr><th>Feature</th><th>What it lets you do</th></tr>
+    <tr><td>Clock domain per pin</td><td>Run each pin (or group) at its own frequency, matching each device interface's real speed.</td></tr>
+    <tr><td>Protocol engine per pin</td><td>Talk to device interfaces at the protocol level instead of hand-writing every vector.</td></tr>
+    <tr><td>PRBS per pin</td><td>Generate and check pseudo-random bit sequences for link and interface tests.</td></tr>
+    <tr><td>SmartLoop</td><td>Support testing of symmetrical high-speed interfaces.</td></tr>
+    <tr><td>On-the-fly pattern changes</td><td>Switch patterns without reloading, which improves multi-site efficiency.</td></tr>
+    <tr><td>Precision DC</td><td>Per-pin DC measurements accurate enough for many parametric tests without a separate instrument.</td></tr>
+  </table></div>
+  <div class="callout info"><b>Variant</b>A PS1600-ME (memory emulation) card was released alongside the standard PS1600. Check your configuration file to see which variant and how much vector memory your cards have.</div>
+  <div class="quiz" data-quiz>
+    <h2>Check your understanding</h2>
+    <div class="q" data-answer="1" data-why="The comparator checks output voltage against VOH/VOL at the strobe time."><p>Which block decides whether a device output was a valid "1"?</p><div class="opts"><button>Driver</button><button>Comparator</button><button>Active load</button></div></div>
+    <div class="q" data-answer="2" data-why="The PPMU forces a current or voltage and measures the other, on each pin."><p>You need to force −100 µA on a pin and read its voltage. Which block?</p><div class="opts"><button>Sequencer</button><button>Fail capture</button><button>PPMU (per-pin DC unit)</button></div></div>
+    <div class="q" data-answer="0" data-why="Clock domain per pin lets each interface run at its own rate."><p>Your device has a 50 MHz SPI port and a 400 MHz parallel bus. Which feature lets both run at their native rates in one test?</p><div class="opts"><button>Clock domain per pin</button><button>PRBS per pin</button><button>Memory emulation</button></div></div>
+  </div>
+</template>
+
+<template data-id="project" data-title="SmarTest 8 project anatomy">
+  <div class="eyebrow">Lesson 3 · Software</div>
+  <h1>Anatomy of a SmarTest 8 project</h1>
+  <p class="lede">SmarTest 8 runs on an Eclipse-based environment. A test program is a project made of setup files that configure the instruments and Java test methods that run the tests.</p>
+  <h2>The building blocks</h2>
+  <p>Advantest's own training breaks a SmarTest 8 program into the same pieces you will see here: setup files configure the tester's instruments, Java test methods hold the test logic, and the two combine into <strong>test suites</strong>, which are the steps of a <strong>test flow</strong>.</p>
+  <div class="bench"><h4>How the pieces connect</h4>
+  <div class="svgwrap"><svg viewBox="0 0 760 250" role="img" aria-label="Setup files (pins, levels, timing, patterns, operating sequence) and a Java test method combine into a test suite; test suites are ordered in a test flow that bins the device">
+    <g stroke="var(--line)" stroke-width="1.5" fill="var(--surface)">
+      <rect x="10" y="10" width="200" height="34" rx="5"/><rect x="10" y="52" width="200" height="34" rx="5"/><rect x="10" y="94" width="200" height="34" rx="5"/><rect x="10" y="136" width="200" height="34" rx="5"/><rect x="10" y="178" width="200" height="34" rx="5"/>
+      <rect x="270" y="70" width="170" height="80" rx="8" fill="var(--warn-soft)" stroke="var(--warn)"/>
+      <rect x="270" y="178" width="170" height="40" rx="6"/>
+      <rect x="500" y="40" width="250" height="180" rx="10"/>
+    </g>
+    <g stroke="var(--accent)" stroke-width="1.8" fill="none"><path d="M210 27 C240 27 240 110 270 110"/><path d="M210 69 C240 69 240 110 270 110"/><path d="M210 111 H270"/><path d="M210 153 C240 153 240 110 270 110"/><path d="M210 195 C240 195 240 110 270 110"/><path d="M355 178 V150"/><path d="M440 110 H500"/></g>
+    <g fill="var(--accent-soft)" stroke="var(--accent)"><rect x="520" y="70" width="210" height="28" rx="5"/><rect x="520" y="106" width="210" height="28" rx="5"/><rect x="520" y="142" width="210" height="28" rx="5"/></g>
+    <g font-size="13" fill="var(--ink)">
+      <text x="20" y="32">Pin configuration</text><text x="20" y="74">Levels (voltages)</text><text x="20" y="116">Timing (edges, periods)</text><text x="20" y="158">Patterns (vectors)</text><text x="20" y="200">Operating sequence</text>
+      <text x="355" y="104" text-anchor="middle" font-weight="700">Test suite</text><text x="355" y="124" text-anchor="middle" font-size="12" fill="var(--muted)">setups + method + limits</text>
+      <text x="355" y="203" text-anchor="middle">Java test method</text>
+      <text x="625" y="62" text-anchor="middle" font-weight="700">Test flow</text>
+      <text x="532" y="89">1 · Continuity</text><text x="532" y="125">2 · Leakage</text><text x="532" y="161">3 · Functional</text>
+      <text x="625" y="204" text-anchor="middle" font-size="12" fill="var(--muted)">pass → next · fail → bin</text>
+    </g>
+  </svg></div></div>
+  <h2>A representative project layout</h2>
+  <p>Folder names depend on your company's project template. This layout shows the kinds of files you will meet, not a required structure.</p>
+<div class="tree">myDevice/                    <span class="d">Eclipse project</span>
+├── src/
+│   └── mydevice/
+│       ├── flows/
+│       │   └── Main.flow        <span class="d">test flow: suites, order, binning</span>
+│       ├── setups/
+│       │   ├── pins …           <span class="d">signal names → tester channels</span>
+│       │   ├── levels …         <span class="d">VIH, VIL, VOH, VOL, supplies</span>
+│       │   ├── timing …         <span class="d">periods, drive edges, strobes</span>
+│       │   └── sequences …      <span class="d">operating sequences</span>
+│       ├── patterns/            <span class="d">vector files from DFT / design</span>
+│       └── testmethods/
+│           └── Continuity.java  <span class="d">your Java test methods</span>
+└── …</div>
+  <h2>A typical working loop</h2>
+  <ol class="steps">
+    <li><span>Open the project in the SmarTest 8 environment and load it onto the tester (or an offline session for editing).</span></li>
+    <li><span>Edit setups or test methods. Java is compiled as you save, so errors show up immediately.</span></li>
+    <li><span>Run one test suite on its own to check it, using debug tools to inspect levels, timing and results.</span></li>
+    <li><span>Run the whole test flow, read the datalog, and adjust.</span></li>
+  </ol>
+  <div class="quiz" data-quiz>
+    <h2>Check your understanding</h2>
+    <div class="q" data-answer="2" data-why="A test suite combines setups, a test method and limits into one test step."><p>What is a test suite?</p><div class="opts"><button>A folder of patterns</button><button>The whole test program</button><button>One test step: setups plus a test method plus limits</button></div></div>
+    <div class="q" data-answer="0" data-why="The test flow orders the suites and decides what happens on pass or fail, including binning."><p>Where do you decide that a continuity failure sends the device to a fail bin?</p><div class="opts"><button>In the test flow</button><button>In the levels setup</button><button>In the pattern file</button></div></div>
+  </div>
+</template>
+
+<template data-id="timing" data-title="Pins, levels and timing">
+  <div class="eyebrow">Lesson 4 · Setups</div>
+  <h1>Pins, levels and timing</h1>
+  <p class="lede">Before any test runs, the tester needs to know which channel is which signal, what voltages mean 0 and 1, and when in each cycle to drive and look.</p>
+  <h2>1. Pin configuration</h2>
+  <p>The pin configuration maps your device's signal names (like <code>CLK</code>, <code>DATA[0:7]</code>, <code>RESET_N</code>) to tester channels, and groups them so you can program many pins at once. For multi-site testing, the same signal is mapped to a different channel for each site. Get this from the load board schematic, and double-check it; a wrong mapping causes failures that look like device problems.</p>
+  <h2>2. Levels</h2>
+  <div class="tablewrap"><table>
+    <tr><th>Level</th><th>Meaning</th><th>Example (3.3 V I/O)</th></tr>
+    <tr><td><code>VIH</code></td><td>Voltage the driver uses for a logic 1 into the device</td><td class="num">3.30 V</td></tr>
+    <tr><td><code>VIL</code></td><td>Voltage the driver uses for a logic 0</td><td class="num">0.00 V</td></tr>
+    <tr><td><code>VOH</code></td><td>Output must be above this to count as 1</td><td class="num">2.40 V</td></tr>
+    <tr><td><code>VOL</code></td><td>Output must be below this to count as 0</td><td class="num">0.40 V</td></tr>
+    <tr><td><code>VDD</code></td><td>Device supply, set on a DC Scale power card</td><td class="num">3.30 V</td></tr>
+  </table></div>
+  <p>Example values are for illustration. Your device datasheet sets the real values, and production programs often test at minimum and maximum supply corners.</p>
+  <h2>3. Timing</h2>
+  <p>Each tester cycle (period) has a <strong>drive edge</strong>, where the driver changes the input, and a <strong>strobe</strong>, where the comparator samples the output. The strobe has to land after the device output has settled and before it changes again.</p>
+  <div class="bench" id="tlab"><h4>Bench · timing lab</h4>
+    <div class="svgwrap"><svg id="tsvg" viewBox="0 0 760 230" role="img" aria-label="Timing diagram for one period: input drive edge, device output delay, and compare strobe"></svg></div>
+    <div class="ctl">
+      <label for="tPer">Period <output id="oPer"></output><input id="tPer" type="range" min="10" max="60" step="1" value="40"></label>
+      <label for="tDrv">Drive edge <output id="oDrv"></output><input id="tDrv" type="range" min="0" max="20" step="1" value="5"></label>
+      <label for="tDly">Device output delay <output id="oDly"></output><input id="tDly" type="range" min="2" max="30" step="1" value="12"></label>
+      <label for="tStb">Strobe position <output id="oStb"></output><input id="tStb" type="range" min="1" max="59" step="1" value="30"></label>
+    </div>
+    <div id="tVerdict"></div>
+    <p class="readout" id="tRead"></p>
+  </div>
+  <p>Try shortening the period with the strobe late in the cycle, or moving the strobe before the output settles. The same trade-off is what a <strong>shmoo plot</strong> sweeps automatically: one axis is a timing or level parameter, the other is another parameter, and each point is pass or fail.</p>
+  <h3>Wavetables and formats</h3>
+  <p>In practice you don't program edges one cycle at a time. You define a small set of waveform shapes (for example, non-return-to-zero data, a return-to-zero clock, or "compare high/low") and the pattern picks one per pin per cycle. The setup that defines those shapes is often called a wavetable.</p>
+  <div class="quiz" data-quiz>
+    <h2>Check your understanding</h2>
+    <div class="q" data-answer="1" data-why="VOH is the comparator threshold for a high output."><p>A device output is 2.1 V and VOH is 2.4 V. The expected value is 1. What happens?</p><div class="opts"><button>Pass: 2.1 V is close enough</button><button>Fail: the output is below VOH</button><button>The tester raises VOH automatically</button></div></div>
+    <div class="q" data-answer="0" data-why="If the strobe lands before the output settles, the comparator reads the old value."><p>Your functional test fails only at the fastest period. The likely timing cause?</p><div class="opts"><button>The strobe now lands before the output has settled</button><button>VIL is too low</button><button>The pin configuration changed</button></div></div>
+    <div class="q" data-answer="2" data-why="The pin configuration maps signal names to tester channels, per site."><p>Which setup tells the tester that <code>RESET_N</code> on site 2 is a particular channel?</p><div class="opts"><button>Levels</button><button>Timing</button><button>Pin configuration</button></div></div>
+  </div>
+</template>
+
+<template data-id="flow" data-title="Patterns, sequences and flows">
+  <div class="eyebrow">Lesson 5 · Program structure</div>
+  <h1>Patterns, operating sequences and test flows</h1>
+  <p class="lede">Patterns hold what to drive and expect. Operating sequences decide what runs on the instruments. Test flows decide what runs, in what order, and what happens on failure.</p>
+  <h2>Patterns (vectors)</h2>
+  <p>A pattern is a table: one row per tester cycle, one column per pin. Each entry says drive 0, drive 1, expect L, expect H, or don't care. Patterns usually come from design and DFT tools (scan, BIST, functional simulation) and are converted for the V93000.</p>
+<pre><code><span class="c-c">// Concept only: one row per cycle</span>
+cycle  CLK  RESET_N  DIN  DOUT
+  0     0     0       0    X     <span class="c-c">reset held, ignore output</span>
+  1     1     0       0    X
+  2     0     1       1    X     <span class="c-c">release reset, drive data</span>
+  3     1     1       1    H     <span class="c-c">expect output high</span>
+  4     0     1       0    L     <span class="c-c">expect output low</span></code></pre>
+  <h2>Operating sequences</h2>
+  <p>An operating sequence describes what the instruments do during a measurement: which patterns run, in what order, and how other actions (like setting a supply or triggering a measurement) fit in. With per-pin sequencers, different pin groups can follow different sequences at the same time.</p>
+  <h2>Test suites and the test flow</h2>
+  <p>A test suite ties a test method to its setups and limits. The test flow is the ordered list of suites with decisions between them. A typical early flow looks like this:</p>
+  <ol class="steps">
+    <li><span><strong>Continuity:</strong> are all pins connected? Stop early if not, so you don't stress a badly seated part.</span></li>
+    <li><span><strong>Shorts and power:</strong> supply current at power-up within limits.</span></li>
+    <li><span><strong>DC parametrics:</strong> leakage, output levels.</span></li>
+    <li><span><strong>Functional and scan:</strong> patterns at nominal and corner conditions.</span></li>
+    <li><span><strong>Binning:</strong> each fail path assigns a soft bin (detailed reason) and a hard bin (handler category).</span></li>
+  </ol>
+  <div class="callout info"><b>Why order matters</b>Cheap, fast, protective tests go first. If a part fails continuity, there is no point spending seconds on scan patterns, and running high-speed patterns on a mis-seated device can damage it or the socket.</div>
+  <div class="quiz" data-quiz>
+    <h2>Check your understanding</h2>
+    <div class="q" data-answer="1" data-why="An X or don't-care entry tells the comparator to ignore that pin in that cycle."><p>In a pattern, what does an X on an output pin mean?</p><div class="opts"><button>Drive the pin to an unknown level</button><button>Don't compare this pin in this cycle</button><button>The pin is disconnected</button></div></div>
+    <div class="q" data-answer="0" data-why="Continuity is fast and protects the device and hardware, so it runs first."><p>Why is continuity normally the first test in a flow?</p><div class="opts"><button>It's fast and catches bad contact before stressful tests run</button><button>It's required by the operating sequence</button><button>It calibrates the tester</button></div></div>
+  </div>
+</template>
+
+<template data-id="java" data-title="Java test methods">
+  <div class="eyebrow">Lesson 6 · Programming</div>
+  <h1>Writing a Java test method</h1>
+  <p class="lede">In SmarTest 8, a test method is a Java class. The test suite gives it a measurement (the configured setups), and the method runs it and evaluates the result.</p>
+  <h2>The shape of a test method</h2>
+  <p>Most test methods follow the same three steps: prepare (read parameters, adjust a setting), execute the measurement, then evaluate and report against limits.</p>
+  <div class="codecap"><span>FunctionalTest.java</span><span class="tag">Illustrative · verify names in your TDC</span></div>
+<pre><code><span class="c-k">package</span> mydevice.testmethods;
+
+<span class="c-k">import</span> xoc.dta.TestMethod;
+<span class="c-k">import</span> xoc.dta.measurement.IMeasurement;
+
+<span class="c-k">public class</span> FunctionalTest <span class="c-k">extends</span> TestMethod {
+
+    <span class="c-c">// Filled in by the test suite: the setups this test uses</span>
+    <span class="c-k">public</span> IMeasurement measurement;
+
+    <span class="c-k">@Override</span>
+    <span class="c-k">public void</span> execute() {
+        <span class="c-c">// 1. Run the patterns with the configured levels and timing</span>
+        measurement.execute();
+
+        <span class="c-c">// 2. Read the pass/fail result</span>
+        <span class="c-k">boolean</span> passed = measurement.hasPassed();
+
+        <span class="c-c">// 3. Report it so the flow can bin and the datalog records it</span>
+        <span class="c-c">//    (the reporting call depends on your release and template)</span>
+    }
+}</code></pre>
+  <h2>Key ideas</h2>
+  <ul>
+    <li><strong>Separation of setup and logic.</strong> Voltages and timing live in setup files, not in Java. The same <code>FunctionalTest</code> class can run many different patterns by pointing different test suites at different setups.</li>
+    <li><strong>Parameters.</strong> Public fields on the class become parameters you can set per test suite, such as a pin group name or a force current.</li>
+    <li><strong>Multi-site.</strong> Results come back per site. Your evaluation code must handle every active site, not just site 1.</li>
+    <li><strong>Reuse first.</strong> Your team almost certainly has a library of standard methods for continuity, leakage and functional tests. Read and reuse them before writing your own.</li>
+  </ul>
+  <h2>A DC test method, in outline</h2>
+  <div class="codecap"><span>Continuity.java (outline)</span><span class="tag">Pseudocode</span></div>
+<pre><code><span class="c-k">public class</span> Continuity <span class="c-k">extends</span> TestMethod {
+    <span class="c-k">public</span> IMeasurement measurement;  <span class="c-c">// PPMU setup on the signal pins</span>
+    <span class="c-k">public</span> String pins = <span class="c-s">"allSignalPins"</span>;
+    <span class="c-k">public double</span> forceCurrent = -100e-6;   <span class="c-c">// −100 µA</span>
+
+    <span class="c-k">public void</span> execute() {
+        <span class="c-c">// set PPMU: force forceCurrent on 'pins', clamp voltage</span>
+        measurement.execute();
+        <span class="c-c">// for each site, for each pin: read voltage</span>
+        <span class="c-c">// compare against limits (e.g. −0.9 V … −0.2 V)</span>
+        <span class="c-c">// report per-pin values to the datalog; fail → flow bins it</span>
+    }
+}</code></pre>
+  <div class="quiz" data-quiz>
+    <h2>Check your understanding</h2>
+    <div class="q" data-answer="2" data-why="Levels belong in setup files so the same Java method can be reused."><p>Where should the VOH value for a functional test be set?</p><div class="opts"><button>Hard-coded in the Java method</button><button>In the pattern file</button><button>In the levels setup used by the test suite</button></div></div>
+    <div class="q" data-answer="1" data-why="Results are per site; evaluation must cover all active sites."><p>Your method only checks results for site 1 in a 4-site program. What goes wrong?</p><div class="opts"><button>Nothing; site 1 represents all sites</button><button>Failures on sites 2–4 can be missed and bad parts shipped</button><button>The program won't compile</button></div></div>
+  </div>
+</template>
+
+<template data-id="dc" data-title="DC parametric tests">
+  <div class="eyebrow">Lesson 7 · DC testing</div>
+  <h1>DC parametric tests with the PPMU</h1>
+  <p class="lede">DC tests check the electrical health of each pin: is it connected, does it leak, and do outputs reach the right voltage under load.</p>
+  <h2>The common DC tests</h2>
+  <div class="tablewrap"><table>
+    <tr><th>Test</th><th>Force</th><th>Measure</th><th>Checks</th></tr>
+    <tr><td>Continuity (opens/shorts)</td><td class="num">−100 µA</td><td>Voltage</td><td>Protection diode to ground is present: pin is connected and not shorted</td></tr>
+    <tr><td>Input leakage high (IIH)</td><td class="num">V = VDD</td><td>Current</td><td>Input draws almost no current when held high</td></tr>
+    <tr><td>Input leakage low (IIL)</td><td class="num">V = 0 V</td><td>Current</td><td>Input draws almost no current when held low</td></tr>
+    <tr><td>Output high (VOH)</td><td class="num">−I<sub>OH</sub></td><td>Voltage</td><td>Output stays high enough while sourcing rated current</td></tr>
+    <tr><td>Output low (VOL)</td><td class="num">+I<sub>OL</sub></td><td>Voltage</td><td>Output stays low enough while sinking rated current</td></tr>
+    <tr><td>Supply current (IDD)</td><td class="num">V = VDD</td><td>Current</td><td>Device consumes the expected current (done on a DC Scale supply)</td></tr>
+  </table></div>
+  <p>Current direction convention: a negative force current flows out of the pin into the tester. Confirm the sign convention used on your system before setting limits.</p>
+  <h2>How continuity works</h2>
+  <p>Most pins have an electrostatic-protection diode from the pin to ground. With the device unpowered (supplies at 0 V), pulling a small current out of the pin forward-biases that diode, so the pin sits around −0.6 V. An open pin has nothing to conduct the current, so the tester hits its voltage clamp. A pin shorted to ground reads close to 0 V.</p>
+  <h2>How the test is wired</h2>
+  <p>The schematic follows one signal pin from the PS1600 channel's PPMU, through the load board, to the protection diodes and circuitry inside the device. Pick a test to see how the forcing source, the meter, the supply and the current path change. The moving dots show where the measured current flows and in which direction; they move slowly for leakage tests, where the current is tiny.</p>
+  <div class="bench" id="slab"><h4>Schematic · one pin under DC test</h4>
+    <div class="seg" id="sMode" role="group" aria-label="Test shown">
+      <button aria-pressed="true" data-v="cont">Continuity</button>
+      <button aria-pressed="false" data-v="iih">IIH</button>
+      <button aria-pressed="false" data-v="iil">IIL</button>
+      <button aria-pressed="false" data-v="voh">VOH</button>
+      <button aria-pressed="false" data-v="vol">VOL</button>
+      <button aria-pressed="false" data-v="idd">IDD</button>
+    </div>
+    <div class="flowbar"><p class="readout" id="sTitle" style="font-weight:600;color:var(--ink)"></p><button class="btn small" id="sPlay" type="button" aria-pressed="false">Pause flow</button></div>
+    <div class="svgwrap" style="margin-top:6px"><svg id="ssvg" viewBox="0 0 760 390" role="img" aria-label="Schematic of a PS1600 channel, load board and device pin for the selected DC test"></svg></div>
+    <ol class="steps" id="sSteps" style="margin-top:16px"></ol>
+    <div class="callout info" id="sNote" style="margin-bottom:0"></div>
+  </div>
+  <p>A few implementation details matter in practice. The PPMU forces and senses through the same channel, so trace and contact resistance add a small error; at 100 µA this is only millivolts, which is why continuity limits can be wide. All pins on all sites are usually measured in parallel, which keeps the test to a few milliseconds. And because supplies are at 0 V during continuity, make sure no earlier test leaves a supply on.</p>
+
+  <div class="bench" id="clab"><h4>Bench · continuity lab</h4>
+    <div class="seg" id="cCond" role="group" aria-label="Pin condition">
+      <button aria-pressed="true" data-v="good">Good pin</button>
+      <button aria-pressed="false" data-v="open">Open (bad contact)</button>
+      <button aria-pressed="false" data-v="gnd">Short to ground</button>
+      <button aria-pressed="false" data-v="weak">Damaged diode</button>
+    </div>
+    <div class="svgwrap" style="margin-top:14px"><svg id="csvg" viewBox="0 0 760 120" role="img" aria-label="Voltage scale from -1.6 V to 0 V with pass window and measured value"></svg></div>
+    <div class="ctl">
+      <label for="cLo">Lower limit <output id="oLo"></output><input id="cLo" type="range" min="-1.5" max="-0.3" step="0.05" value="-0.9"></label>
+      <label for="cHi">Upper limit <output id="oHi"></output><input id="cHi" type="range" min="-0.6" max="0" step="0.05" value="-0.2"></label>
+    </div>
+    <div id="cVerdict"></div>
+    <p class="readout" id="cRead"></p>
+  </div>
+  <div class="callout"><b>Safety</b>Always set a voltage clamp when forcing current, and a current clamp when forcing voltage. Without clamps, an open pin can drive the PPMU to its full voltage range and stress the device or load board.</div>
+  <h2>Settling and accuracy</h2>
+  <ul>
+    <li><strong>Settling time:</strong> after forcing, wait long enough for the pin and load board capacitance to settle before measuring. Too short a wait gives noisy, drifting readings.</li>
+    <li><strong>Current range:</strong> choose the smallest range that covers the expected value. Leakage tests in the nA–µA region need a low range for useful resolution.</li>
+    <li><strong>Load board leakage:</strong> relays, components and dirty sockets add leakage. Measure an empty socket to know your baseline.</li>
+  </ul>
+  <div class="quiz" data-quiz>
+    <h2>Check your understanding</h2>
+    <div class="q" data-answer="1" data-why="With no conduction path, the PPMU drives until it hits its voltage clamp."><p>A continuity test reads −1.5 V, right at the clamp. Most likely cause?</p><div class="opts"><button>Pin shorted to ground</button><button>Open pin: no contact or bonding problem</button><button>A perfectly good pin</button></div></div>
+    <div class="q" data-answer="0" data-why="A short to ground means no diode drop, so the voltage is near 0 V."><p>Which reading points to a pin shorted to ground?</p><div class="opts"><button>About 0 V</button><button>About −0.6 V</button><button>About −1.5 V</button></div></div>
+    <div class="q" data-answer="2" data-why="Leakage limits are in the nA–µA region, so use a low current range for resolution."><p>Leakage limits are ±1 µA. Which current range should you use?</p><div class="opts"><button>The largest range, to be safe</button><button>It doesn't matter</button><button>The smallest range that covers ±1 µA</button></div></div>
+  </div>
+</template>
+
+<template data-id="debug" data-title="Debug and maintenance">
+  <div class="eyebrow">Lesson 8 · Debug</div>
+  <h1>Debug and day-to-day maintenance</h1>
+  <p class="lede">Most failures on a new program are setup problems, not device problems. Work from the hardware outward to the device.</p>
+  <h2>A failure triage order</h2>
+  <ol class="steps">
+    <li><span><strong>Is the tester healthy?</strong> Check that system diagnostics and calibration are current. A failing channel can look like a failing device.</span></li>
+    <li><span><strong>Is the contact good?</strong> Run continuity. Check socket, probe card and load board for damage or contamination.</span></li>
+    <li><span><strong>Is the setup right?</strong> Confirm pin mapping against the load board schematic, then levels, then timing.</span></li>
+    <li><span><strong>Is it the pattern?</strong> Look at the first failing cycle and pin, not the total fail count.</span></li>
+    <li><span><strong>Is it the device?</strong> Only now compare against known-good parts and the datasheet.</span></li>
+  </ol>
+  <h2>Common symptoms and where to look</h2>
+  <div class="tablewrap"><table>
+    <tr><th>Symptom</th><th>Likely cause</th><th>First check</th></tr>
+    <tr><td>Every pin of one site fails continuity</td><td>Site not contacting, or supply relay open</td><td>Socket seating, load board relays for that site</td></tr>
+    <tr><td>Same pin fails on every device</td><td>Pin map error or bad channel/trace</td><td>Pin configuration, channel diagnostics, load board trace</td></tr>
+    <tr><td>Functional fails only at fast periods</td><td>Strobe too close to output transition</td><td>Shmoo period against strobe position</td></tr>
+    <tr><td>Fails at one supply corner only</td><td>Levels too tight for that corner, or real device margin</td><td>Shmoo VDD against VOH/VOL</td></tr>
+    <tr><td>Leakage creeps up over a lot</td><td>Socket contamination or wear</td><td>Empty-socket baseline, clean or replace socket</td></tr>
+    <tr><td>Results change with test order</td><td>Previous test leaves state behind (relays, levels, device mode)</td><td>Run the suite alone, compare with full flow</td></tr>
+  </table></div>
+  <h2>Tools you will use</h2>
+  <div class="grid2">
+    <div class="card"><h3>Debug mode</h3><p>Run a single test suite step by step and inspect what the instruments were set to.</p></div>
+    <div class="card"><h3>Shmoo and Margin tools</h3><p>Sweep one or two parameters to see where a test passes and fails.</p></div>
+    <div class="card"><h3>Datalog</h3><p>Per-test, per-pin values and limits. Your first stop for any yield question.</p></div>
+    <div class="card"><h3>Pattern and fail views</h3><p>Show which cycles and pins failed, so you can trace back to the device behaviour.</p></div>
+  </div>
+  <h2>Maintenance basics</h2>
+  <ul>
+    <li><strong>Calibration and diagnostics</strong> run on a schedule set by your site. Know when yours were last run, and don't release results from a tester with failing diagnostics.</li>
+    <li><strong>Load boards and sockets</strong> wear. Track insertion counts and keep a known-good "golden" device to check a setup quickly.</li>
+    <li><strong>Hardware work</strong> such as card swaps follows your site's electrical safety and ESD rules. Advantest's maintenance training for Smart Scale systems lists lock-out/tag-out and ESD training as prerequisites, which tells you how seriously to take it.</li>
+  </ul>
+  <div class="quiz" data-quiz>
+    <h2>Check your understanding</h2>
+    <div class="q" data-answer="2" data-why="A fault that follows the pin, not the device, points to setup or hardware."><p>Pin <code>D5</code> fails on every device you try. What do you check first?</p><div class="opts"><button>Ask design for a new pattern</button><button>Loosen the VOH limit</button><button>Pin mapping and that channel's hardware path</button></div></div>
+    <div class="q" data-answer="0" data-why="The first failing cycle shows the root event; later fails are often consequences."><p>A pattern shows 12,000 failing cycles. Where should you look?</p><div class="opts"><button>The first failing cycle and pin</button><button>The last failing cycle</button><button>The total count only</button></div></div>
+  </div>
+</template>
+
+<template data-id="gloss" data-title="Glossary and next steps">
+  <div class="eyebrow">Lesson 9 · Reference</div>
+  <h1>Glossary and next steps</h1>
+  <dl class="gloss">
+    <dt>ATE</dt><dd>Automatic test equipment: the tester as a whole.</dd>
+    <dt>DUT</dt><dd>Device under test.</dd>
+    <dt>PS1600</dt><dd>Pin Scale 1600, the 128-channel, 1.6 Gbit/s digital card of the V93000 Smart Scale generation.</dd>
+    <dt>PPMU</dt><dd>Per-pin parametric measurement unit: forces voltage or current on a pin and measures the other.</dd>
+    <dt>DPS</dt><dd>Device power supply, on DC Scale cards.</dd>
+    <dt>VIH / VIL</dt><dd>Driver high and low voltages into device inputs.</dd>
+    <dt>VOH / VOL</dt><dd>Comparator thresholds for device outputs.</dd>
+    <dt>Strobe</dt><dd>The moment in a cycle when the comparator samples the output.</dd>
+    <dt>Period</dt><dd>Length of one tester cycle.</dd>
+    <dt>Wavetable</dt><dd>Set of waveform shapes a pattern can pick per pin per cycle.</dd>
+    <dt>Pattern / vectors</dt><dd>Cycle-by-cycle drive and expect data.</dd>
+    <dt>Operating sequence</dt><dd>Description of what the instruments run during a measurement.</dd>
+    <dt>Test method</dt><dd>Java class containing test logic.</dd>
+    <dt>Test suite</dt><dd>A test step: test method plus setups plus limits.</dd>
+    <dt>Test flow</dt><dd>Ordered suites with pass/fail decisions and binning.</dd>
+    <dt>Shmoo</dt><dd>Plot of pass/fail across one or two swept parameters.</dd>
+    <dt>Soft / hard bin</dt><dd>Detailed fail category / handler sort category.</dd>
+    <dt>Multi-site</dt><dd>Testing several devices at once on one load board.</dd>
+  </dl>
+  <h2>Where to go next</h2>
+  <ol class="steps">
+    <li><span>Open a working production program from your team and trace one test suite from the flow to its Java method and setups.</span></li>
+    <li><span>Run continuity and a functional test on a known-good device in debug mode, and read the datalog.</span></li>
+    <li><span>Make a shmoo of period against strobe on one functional test.</span></li>
+    <li><span>Take Advantest's SmarTest 8 Basic User Training. It runs five days, and Advantest's Singapore training centre lists scheduled sessions; contact <code>pdl-asp-training@advantest.com</code> for dates.</span></li>
+  </ol>
+  <div class="quiz" data-quiz>
+    <h2>Final check</h2>
+    <div class="q" data-answer="1" data-why="PS1600 = 128 channels, up to 1.6 Gbit/s."><p>Which describes the PS1600?</p><div class="opts"><button>256 channels, 5 Gbit/s</button><button>128 channels, up to 1.6 Gbit/s</button><button>64 channels, 400 Mbit/s</button></div></div>
+    <div class="q" data-answer="2" data-why="Setups configure instruments; the method runs and evaluates; the suite combines them."><p>Which pairing is right?</p><div class="opts"><button>Levels → Java; logic → setup files</button><button>Binning → pattern file</button><button>Instrument settings → setup files; test logic → Java test method</button></div></div>
+    <div class="q" data-answer="0" data-why="Continuity uses the protection diode: around −0.6 V is a healthy pin."><p>A healthy pin in a −100 µA continuity test reads about…</p><div class="opts"><button>−0.6 V</button><button>0 V</button><button>+3.3 V</button></div></div>
+  </div>
+</template>
+
+<script>
+(function(){
+  const tpls=[...document.querySelectorAll('template[data-id]')];
+  const lessons=tpls.map(t=>({id:t.dataset.id,title:t.dataset.title,tpl:t}));
+  const KEY='ps1600-course-v1';
+  let state={done:{},answers:{}};
+  try{const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s&&s.done) state=s;}catch(e){}
+  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}};
+  const nav=document.getElementById('nav'), host=document.getElementById('lesson');
+
+  function renderNav(cur){
+    nav.innerHTML='';
+    lessons.forEach((l,i)=>{
+      const li=document.createElement('li'); if(state.done[l.id]) li.className='done';
+      const b=document.createElement('button'); b.type='button';
+      b.setAttribute('aria-current',l.id===cur?'true':'false');
+      b.innerHTML='<span class="n">'+String(i).padStart(2,'0')+'</span><span class="t">'+l.title+'</span><span class="ck"></span>';
+      b.onclick=()=>{location.hash=l.id};
+      li.appendChild(b); nav.appendChild(li);
+    });
+    const n=Object.keys(state.done).filter(k=>state.done[k]).length;
+    document.getElementById('pbar').style.width=(n/lessons.length*100)+'%';
+    document.getElementById('plbl').textContent=n+' of '+lessons.length+' lessons done';
+    const a=nav.querySelector('[aria-current="true"]'); if(a&&a.scrollIntoView&&window.innerWidth<860) a.scrollIntoView({block:'nearest',inline:'center'});
+  }
+
+  function show(id){
+    const idx=Math.max(0,lessons.findIndex(l=>l.id===id));
+    const l=lessons[idx];
+    host.innerHTML=''; host.appendChild(l.tpl.content.cloneNode(true));
+    // pager
+    const pg=document.createElement('div'); pg.className='pager';
+    const prev=document.createElement('button'); prev.className='btn'; prev.type='button';
+    const next=document.createElement('button'); next.className='btn primary'; next.type='button';
+    if(idx>0){prev.textContent='← '+lessons[idx-1].title; prev.onclick=()=>location.hash=lessons[idx-1].id;} else prev.hidden=true;
+    if(idx<lessons.length-1){next.textContent=lessons[idx+1].title+' →'; next.onclick=()=>location.hash=lessons[idx+1].id;} else next.hidden=true;
+    pg.append(prev,next); host.appendChild(pg);
+    setupQuiz(l.id); renderNav(l.id);
+    if(l.id==='timing') timingLab();
+    if(l.id==='dc'){ schLab(); contLab(); }
+    window.scrollTo(0,0);
+  }
+
+  function setupQuiz(lid){
+    const qs=[...host.querySelectorAll('.q')];
+    state.answers[lid]=state.answers[lid]||{};
+    qs.forEach((q,qi)=>{
+      const ans=+q.dataset.answer, btns=[...q.querySelectorAll('.opts button')];
+      const why=document.createElement('p'); why.className='why'; why.hidden=true; q.appendChild(why);
+      const reveal=(pick)=>{
+        btns.forEach((b,bi)=>{b.disabled=true; if(bi===ans) b.classList.add('right'); else if(bi===pick) b.classList.add('wrong');});
+        why.textContent=(pick===ans?'Correct. ':'Not quite. ')+q.dataset.why; why.hidden=false;
+      };
+      btns.forEach((b,bi)=>{b.type='button'; b.onclick=()=>{
+        state.answers[lid][qi]=bi; reveal(bi);
+        if(Object.keys(state.answers[lid]).length===qs.length){state.done[lid]=true; renderNav(lid);}
+        save();
+      };});
+      if(state.answers[lid][qi]!==undefined) reveal(state.answers[lid][qi]);
+    });
+  }
+
+  /* ---------- timing lab ---------- */
+  function timingLab(){
+    const $=id=>document.getElementById(id);
+    const svg=$('tsvg'), ids=['tPer','tDrv','tDly','tStb'];
+    const draw=()=>{
+      const P=+$('tPer').value, D=+$('tDrv').value, L=+$('tDly').value; let S=+$('tStb').value;
+      if(S>P-1){S=P-1;} $('tStb').max=P-1; if(+$('tStb').value>P-1)$('tStb').value=P-1;
+      const Dd=Math.min(D,P-1); $('tDrv').max=Math.min(20,P-2);
+      $('oPer').textContent=P+' ns ('+(1000/P).toFixed(0)+' MHz)'; $('oDrv').textContent=Dd+' ns';
+      $('oDly').textContent=L+' ns'; $('oStb').textContent=S+' ns';
+      const x0=70,x1=740,W=x1-x0, sx=t=>x0+t/P*W;
+      const settle=Dd+L, valid=settle<P; // output valid from settle to next period's settle (P+settle)
+      const ok = valid && S>=settle;
+      let g='';
+      // grid
+      for(let t=0;t<=P;t+=Math.max(5,Math.round(P/8/5)*5)){g+=`<line x1="${sx(t)}" x2="${sx(t)}" y1="20" y2="190" stroke="var(--grid)"/><text x="${sx(t)}" y="210" font-size="11" text-anchor="middle" fill="var(--muted)">${t}</text>`;}
+      g+=`<text x="${x1}" y="226" font-size="11" text-anchor="end" fill="var(--muted)">time in cycle (ns)</text>`;
+      // input
+      const yH=40,yL=80, dx=sx(Dd);
+      g+=`<text x="8" y="66" font-size="13" fill="var(--ink)" font-weight="600">Input</text>`;
+      g+=`<path d="M${x0} ${yL} H${dx} L${dx+4} ${yH} H${x1}" fill="none" stroke="var(--sig1)" stroke-width="2.5"/>`;
+      g+=`<text x="${dx+6}" y="${yH-6}" font-size="11" fill="var(--sig1)">drive edge</text>`;
+      // output
+      const oH=120,oL=160;
+      g+=`<text x="8" y="146" font-size="13" fill="var(--ink)" font-weight="600">Output</text>`;
+      if(valid){const ox=sx(settle);
+        g+=`<rect x="${dx}" y="${oH}" width="${Math.max(0,ox-dx)}" height="${oL-oH}" fill="var(--warn-soft)"/>`;
+        g+=`<path d="M${x0} ${oL} H${ox} L${ox+4} ${oH} H${x1}" fill="none" stroke="var(--sig2)" stroke-width="2.5"/>`;
+        g+=`<text x="${(dx+ox)/2}" y="${oL+16}" font-size="11" text-anchor="middle" fill="var(--warn)">settling</text>`;
+      } else {
+        g+=`<rect x="${dx}" y="${oH}" width="${x1-dx}" height="${oL-oH}" fill="var(--warn-soft)"/>`;
+        g+=`<path d="M${x0} ${oL} H${x1}" fill="none" stroke="var(--sig2)" stroke-width="2.5"/>`;
+        g+=`<text x="${(dx+x1)/2}" y="${oL+16}" font-size="11" text-anchor="middle" fill="var(--warn)">output not settled within this period</text>`;
+      }
+      // strobe
+      const sxS=sx(S);
+      g+=`<line x1="${sxS}" x2="${sxS}" y1="104" y2="176" stroke="${ok?'var(--pass)':'var(--fail)'}" stroke-width="2.5" stroke-dasharray="5 3"/>`;
+      g+=`<circle cx="${sxS}" cy="${oH-0}" r="0"/><text x="${sxS}" y="100" font-size="11" text-anchor="middle" fill="${ok?'var(--pass)':'var(--fail)'}" font-weight="600">strobe</text>`;
+      svg.innerHTML=g;
+      $('tVerdict').innerHTML=ok?'<span class="verdict pass">PASS · comparator reads the new value</span>':'<span class="verdict fail">FAIL · comparator reads the old value</span>';
+      $('tRead').textContent = valid
+        ? `Output is valid from ${settle} ns (drive edge ${Dd} ns + device delay ${L} ns). Strobe margin: ${S-settle} ns${S-settle<0?' (negative: too early)':''}.`
+        : `Drive edge plus device delay is ${settle} ns, longer than the ${P} ns period. Lengthen the period or move the drive edge earlier.`;
+    };
+    ids.forEach(i=>$(i).addEventListener('input',draw)); draw();
+  }
+
+  /* ---------- schematic toggle ---------- */
+  function schLab(){
+    const box=document.getElementById('slab'); if(!box) return;
+    const svg=document.getElementById('ssvg'), stepsEl=document.getElementById('sSteps'),
+          noteEl=document.getElementById('sNote'), titleEl=document.getElementById('sTitle');
+    const btns=[...box.querySelectorAll('#sMode button')];
+    const M={
+      cont:{title:'Continuity: are the pin and its contact present?',src:'I',meter:'V',vdd:'0 V',side:'in',
+        force:'force −100 µA',clamp:'V clamp ±1.5 V',
+        path:'M590 320 V200 H170 V243',speed:.7,arrows:[[612,300,612,232],[450,186,362,186]],cur:'100 µA',curAt:[405,178],
+        exp:['pin ≈ −0.6 V','(D1 forward drop)'],
+        steps:['Set all device supplies to <strong>0 V</strong> on the DC Scale card, so D2 cannot conduct and only D1 is in the path.',
+          'Turn the pin driver off and close the <strong>PPMU relay</strong> on each pin under test.',
+          'Force <strong>−100 µA</strong> (current out of the pin) with a voltage clamp, typically around ±1.5 V.',
+          'Wait for settling, then <strong>measure voltage</strong> on every pin and every site in parallel.',
+          'Compare with limits, for example −0.9 V to −0.2 V. Set force to 0, open the relays and restore the drivers.'],
+        note:'<b>Reading the result</b>About −0.6 V is a healthy diode. A reading at the clamp (−1.5 V) means an open: bad contact, bent lead or bonding fault. Near 0 V means a short to ground. Some designs also run the test at +100 µA to check D2 to the VDD rail.'},
+      iih:{title:'Input leakage high (IIH): does the input draw current when held high?',src:'V',meter:'A',vdd:'3.3 V',side:'in',
+        force:'force V = VDD',clamp:'I clamp, low range',
+        path:'M170 243 V200 H645',speed:2.6,arrows:[[362,186,450,186]],cur:'nA – µA',curAt:[405,178],
+        exp:['|I| < 1 µA','(no diode conducts)'],
+        steps:['<strong>Power the device</strong> at VDD (often VDD max, the worst case for leakage) and put it in a known state with a reset or setup pattern.',
+          'Turn the pin driver off and close the <strong>PPMU relay</strong>.',
+          'Force <strong>V = VDD</strong> on the pin. With the pin at the rail, D2 has no forward bias and D1 is reversed.',
+          'Use the <strong>lowest current range</strong> that covers the limit, with a current clamp. Wait for settling, then <strong>measure current</strong>.',
+          'Compare with limits, for example ±1 µA, then release the pin.'],
+        note:'<b>Watch for</b>Pins with an internal pull-down resistor pass a large current in IIH by design, so they need their own limits from the datasheet. Load board relays and dirty sockets add leakage; measure an empty socket to know your baseline.'},
+      iil:{title:'Input leakage low (IIL): does the input draw current when held low?',src:'V',meter:'A',vdd:'3.3 V',side:'in',
+        force:'force V = 0 V',clamp:'I clamp, low range',
+        path:'M170 243 V200 H645',speed:2.6,rev:true,arrows:[[450,186,362,186]],cur:'nA – µA',curAt:[405,178],
+        exp:['|I| < 1 µA','(higher if pull-up fitted)'],
+        steps:['<strong>Power the device</strong> at VDD and put it in a known state with a reset or setup pattern.',
+          'Turn the pin driver off and close the <strong>PPMU relay</strong>.',
+          'Force <strong>V = 0 V</strong> on the pin. D1 has no forward bias and D2 is reversed.',
+          'Use the <strong>lowest current range</strong> that covers the limit, with a current clamp. Wait for settling, then <strong>measure current</strong>. Leakage flows out of the pin, so the sign is negative.',
+          'Compare with limits, for example ±1 µA, then release the pin.'],
+        note:'<b>Watch for</b>Pins with an internal pull-up resistor source tens of µA in IIL. That is normal; the datasheet gives a separate limit, and a reading near zero can actually mean the pull-up is missing.'},
+      voh:{title:'Output high voltage (VOH): does the output stay high under load?',src:'I',meter:'V',vdd:'3.3 V',side:'out',p:'on',n:'off',
+        force:'force −I(OH)',clamp:'V clamp',
+        path:'M660 90 V200 H170 V243',speed:.45,arrows:[[634,100,634,186],[450,186,362,186]],cur:'I(OH), e.g. 2 mA',curAt:[405,178],
+        exp:['V ≥ VOH min','e.g. ≥ 2.4 V at −2 mA'],
+        steps:['<strong>Power the device</strong>, usually at VDD min, where the output is weakest.',
+          'Run a <strong>preconditioning pattern</strong> that sets the output pin high and stops there, so the device keeps driving it.',
+          'Turn the pin driver off and close the <strong>PPMU relay</strong>.',
+          'Force <strong>−I(OH)</strong> (current pulled out of the pin) with a voltage clamp. Current flows from VDD through the device\'s P-side output transistor into the tester.',
+          'Wait for settling, <strong>measure voltage</strong>, and check it is at or above VOH min.'],
+        note:'<b>Range check</b>I(OH) for strong outputs can reach several mA. If it is beyond the PPMU current range on your configuration, use the channel\'s active load or a DC Scale VI resource instead. Your TDC hardware specification gives the PPMU ranges.'},
+      vol:{title:'Output low voltage (VOL): does the output stay low under load?',src:'I',meter:'V',vdd:'3.3 V',side:'out',p:'off',n:'on',
+        force:'force +I(OL)',clamp:'V clamp',
+        path:'M170 243 V200 H660 V320',speed:.45,arrows:[[362,186,450,186],[634,214,634,300]],cur:'I(OL), e.g. 2 mA',curAt:[405,178],
+        exp:['V ≤ VOL max','e.g. ≤ 0.4 V at +2 mA'],
+        steps:['<strong>Power the device</strong>, usually at VDD min.',
+          'Run a <strong>preconditioning pattern</strong> that sets the output pin low and stops there.',
+          'Turn the pin driver off and close the <strong>PPMU relay</strong>.',
+          'Force <strong>+I(OL)</strong> (current pushed into the pin) with a voltage clamp. Current flows from the tester through the device\'s N-side output transistor to ground.',
+          'Wait for settling, <strong>measure voltage</strong>, and check it is at or below VOL max.'],
+        note:'<b>Common mistake</b>If the preconditioning pattern did not leave the output low (wrong stop cycle, device reset, output tri-stated), the PPMU drives the pin to its clamp and the test fails. Check the pin state with a functional compare before blaming the output stage.'},
+      idd:{title:'Supply current (IDD): does the device draw the expected current?',src:'V',meter:'V',vdd:'3.3 V',side:'in',idd:true,
+        force:'not used',clamp:'relay open',
+        path:'M130 90 H725 V320',speed:.6,arrows:[[200,76,300,76],[712,110,712,190]],cur:'I(DD)',curAt:[250,66],
+        exp:['I within IDD limit','(static state, e.g. IDDQ)'],
+        steps:['<strong>Power the device</strong> from the DC Scale supply, often at VDD max.',
+          'Run a pattern that puts the device in a <strong>defined static state</strong> (for IDDQ, specific quiet vectors from DFT).',
+          'Keep <strong>PPMU relays open</strong>. Pin drivers hold every input at a rail so nothing floats; a floating input causes extra current.',
+          'Switch the supply\'s current measurement to a <strong>suitable range</strong> and wait for settling. Static IDDQ needs a low range and longer settling.',
+          'Measure current on the <strong>supply</strong> (not on the signal pins) and compare with the limit.'],
+        note:'<b>Static and dynamic</b>IDDQ measures the quiet current in a static state and is sensitive to defects. Dynamic IDD is measured while patterns run. Both use the DC Scale supply\'s meter, not the PS1600 PPMU.'}
+    };
+    const gnd=(x,y)=>`<path d="M${x} ${y} V${y+10} M${x-14} ${y+10} H${x+14} M${x-9} ${y+16} H${x+9} M${x-4} ${y+22} H${x+4}" stroke="var(--ink)" stroke-width="2" fill="none"/>`;
+    const T=(x,y,t,o='')=>`<text x="${x}" y="${y}" ${o}>${t}</text>`;
+    function draw(m){
+      const c=M[m], out=c.side==='out';
+      let g=`<defs><marker id="arw" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--pass)"/></marker></defs>`;
+      g+=`<g fill="none" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="6 4"><rect x="10" y="40" width="290" height="340" rx="10"/><rect x="310" y="40" width="170" height="340" rx="10"/><rect x="490" y="40" width="260" height="340" rx="10"/></g>`;
+      g+=`<g font-family="var(--f-mono)" font-size="11" fill="var(--muted)" letter-spacing=".06em">${T(22,32,'TESTER')}${T(322,32,'LOAD BOARD')}${T(502,32,'DEVICE (DUT)')}</g>`;
+      // highlight path + arrows
+      g+=`<path d="${c.path}" fill="none" stroke="var(--pass)" stroke-width="8" stroke-opacity=".22" stroke-linejoin="round"/>`;
+      g+=`<path class="flow${c.rev?' rev':''}" d="${c.path}" style="animation-duration:${c.speed}s"/>`;
+      c.arrows.forEach(a=>{g+=`<path d="M${a[0]} ${a[1]} L${a[2]} ${a[3]}" stroke="var(--pass)" stroke-width="2" marker-end="url(#arw)"/>`;});
+      g+=`<text x="${c.curAt[0]}" y="${c.curAt[1]}" font-size="12" text-anchor="middle" fill="var(--pass)" font-weight="600">${c.cur}</text>`;
+      // supply
+      g+=`<rect x="30" y="72" width="100" height="36" rx="5" fill="var(--bench)" stroke="var(--ink)" stroke-width="1.5"/>`;
+      g+=T(80,88,'DPS','text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)"')+T(80,101,'DC Scale','text-anchor="middle" font-size="10" fill="var(--muted)"');
+      if(c.idd){
+        g+=`<path d="M130 90 H142 M178 90 H725" stroke="var(--ink)" stroke-width="2" fill="none"/><circle cx="160" cy="90" r="18" fill="var(--surface)" stroke="var(--pass)" stroke-width="2.5"/>`;
+        g+=T(160,96,'A','text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)"')+T(160,124,'supply meter','text-anchor="middle" font-size="11" fill="var(--pass)" font-weight="600"');
+      } else g+=`<path d="M130 90 H725" stroke="var(--ink)" stroke-width="2" fill="none"/>`;
+      g+=T(395,82,'VDD supply trace','text-anchor="middle" font-size="11" fill="var(--muted)"');
+      g+=T(742,82,'VDD = '+c.vdd,'text-anchor="end" font-size="11" font-weight="600" fill="var(--warn)"');
+      // PPMU block
+      g+=`<g opacity="${c.idd?0.35:1}">`;
+      g+=`<path d="M80 200 H262 M80 200 V243 M80 287 V310 M170 200 V243 M170 287 V310 M60 310 H190" stroke="var(--ink)" stroke-width="2" fill="none"/>`+gnd(110,310);
+      g+=`<circle cx="80" cy="265" r="22" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/>`+T(80,271,c.idd?'V':c.meter,'text-anchor="middle" font-size="17" font-weight="700" fill="var(--ink)"');
+      g+=`<circle cx="170" cy="265" r="22" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/>`;
+      g+= c.src==='I' ? `<path d="M170 278 V253 M164 259 L170 250 L176 259" stroke="var(--ink)" stroke-width="2" fill="none"/>`
+                      : T(170,262,'+','text-anchor="middle" font-size="14" font-weight="700" fill="var(--ink)"')+T(170,281,'−','text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)"');
+      g+=T(80,302,'meter','text-anchor="middle" font-size="11" fill="var(--muted)"')+T(200,258,'PPMU','font-size="12" font-weight="700" fill="var(--ink)"');
+      g+=T(200,274,c.force,'font-size="11" fill="var(--muted)"')+T(200,288,c.clamp,'font-size="11" fill="var(--muted)"');
+      g+=`</g>`;
+      // relay
+      g+=`<circle cx="265" cy="200" r="3.5" fill="var(--ink)"/><circle cx="295" cy="200" r="3.5" fill="var(--ink)"/>`;
+      g+= c.idd ? `<path d="M265 200 L290 180" stroke="var(--ink)" stroke-width="2"/>` : `<path d="M265 200 L295 196" stroke="var(--ink)" stroke-width="2"/>`;
+      g+=T(280,226,c.idd?'PPMU relay open':'PPMU relay','text-anchor="middle" font-size="11" fill="var(--muted)"');
+      if(c.idd) g+=T(155,176,'driver holds pin at a rail','text-anchor="middle" font-size="11" font-weight="600" fill="var(--accent)"');
+      // signal line
+      g+=`<path d="M298 200 H520 M536 200 H${out?660:645}" stroke="var(--ink)" stroke-width="2" fill="none"/>`;
+      g+=`<rect x="302" y="192" width="16" height="16" rx="3" fill="var(--bench)" stroke="var(--ink)" stroke-width="1.5"/>`+T(326,228,'pogo pin','font-size="11" fill="var(--muted)"')+T(425,228,'board trace','text-anchor="middle" font-size="11" fill="var(--muted)"');
+      g+=`<rect x="520" y="192" width="16" height="16" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="2"/>`+T(528,228,'pin','text-anchor="middle" font-size="11" font-weight="600" fill="var(--accent)"');
+      // ESD diodes
+      g+=`<path d="M590 200 V250 M590 280 V310 M590 200 V160 M590 130 V90" stroke="var(--ink)" stroke-width="2" fill="none"/>`+gnd(590,310);
+      g+=`<path d="M577 280 L603 280 L590 252 Z" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/><path d="M577 250 H603" stroke="var(--ink)" stroke-width="2.5"/>`;
+      g+=`<path d="M577 160 L603 160 L590 132 Z" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/><path d="M577 130 H603" stroke="var(--ink)" stroke-width="2.5"/>`;
+      g+=T(571,262,'D1','text-anchor="end" font-size="12" font-weight="700" fill="var(--ink)"')+T(571,276,'ESD','text-anchor="end" font-size="10" fill="var(--muted)"');
+      g+=T(571,142,'D2','text-anchor="end" font-size="12" font-weight="700" fill="var(--ink)"')+T(571,156,'ESD','text-anchor="end" font-size="10" fill="var(--muted)"');
+      // device circuit
+      if(out){
+        const on=v=>v==='on'?'var(--pass)':'var(--muted)';
+        g+=`<path d="M660 90 V115 M660 155 V245 M660 285 V310" stroke="var(--ink)" stroke-width="2" fill="none"/>`+gnd(660,310);
+        g+=`<rect x="645" y="115" width="30" height="40" rx="4" fill="var(--surface)" stroke="${on(c.p)}" stroke-width="2"/>`+T(660,140,'P','text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)"');
+        g+=`<rect x="645" y="245" width="30" height="40" rx="4" fill="var(--surface)" stroke="${on(c.n)}" stroke-width="2"/>`+T(660,270,'N','text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)"');
+        g+=T(680,139,c.p,`font-size="11" font-weight="600" fill="${on(c.p)}"`)+T(680,269,c.n,`font-size="11" font-weight="600" fill="${on(c.n)}"`);
+        g+=T(660,358,'output stage','text-anchor="middle" font-size="11" fill="var(--muted)"');
+      } else {
+        g+=`<path d="M645 182 L645 218 L679 200 Z" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/><path d="M679 200 H700" stroke="var(--muted)" stroke-width="2" stroke-dasharray="4 3"/>`;
+        g+=T(662,236,'input buffer','text-anchor="middle" font-size="11" fill="var(--muted)"');
+      }
+      g+=`<path d="M725 90 V230 M725 280 V310" stroke="var(--ink)" stroke-width="2" fill="none"/>`+gnd(725,310);
+      g+=`<rect x="705" y="230" width="40" height="50" rx="4" fill="var(--bench)" stroke="var(--ink)" stroke-width="1.5"/>`+T(725,259,'core','text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)"');
+      // expected
+      g+=T(322,300,'Expected','font-size="12" font-weight="700" fill="var(--ink)"')+T(322,318,c.exp[0],'font-size="12" fill="var(--ink)"')+T(322,334,c.exp[1],'font-size="11" fill="var(--muted)"');
+      svg.innerHTML=g;
+      titleEl.textContent=c.title;
+      stepsEl.innerHTML=c.steps.map(s=>'<li><span>'+s+'</span></li>').join('');
+      noteEl.innerHTML=c.note;
+      btns.forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===m?'true':'false'));
+    }
+    btns.forEach(b=>{b.type='button'; b.onclick=()=>draw(b.dataset.v);});
+    const play=document.getElementById('sPlay');
+    play.onclick=()=>{const p=box.classList.toggle('paused'); play.textContent=p?'Play flow':'Pause flow'; play.setAttribute('aria-pressed',p?'true':'false');};
+    draw('cont');
+  }
+
+  /* ---------- continuity lab ---------- */
+  function contLab(){
+    const $=id=>document.getElementById(id);
+    const vals={good:-0.62,open:-1.5,gnd:-0.02,weak:-0.31};
+    const desc={good:'Protection diode conducts: about −0.6 V.',open:'No path for current: the PPMU hits its −1.5 V clamp.',gnd:'Pin tied to ground: almost no voltage across it.',weak:'Damaged or leaky diode: reads closer to 0 V than a healthy pin.'};
+    let cond='good';
+    const svg=$('csvg');
+    const draw=()=>{
+      let lo=+$('cLo').value, hi=+$('cHi').value; if(hi<=lo){hi=lo+0.05;$('cHi').value=hi;}
+      $('oLo').textContent=lo.toFixed(2)+' V'; $('oHi').textContent=hi.toFixed(2)+' V';
+      const v=vals[cond], pass=v>=lo&&v<=hi;
+      const x0=40,x1=720,vmin=-1.6,vmax=0, sx=x=>x0+(x-vmin)/(vmax-vmin)*(x1-x0);
+      let g=`<rect x="${sx(lo)}" y="30" width="${sx(hi)-sx(lo)}" height="34" fill="var(--pass-soft)" stroke="var(--pass)"/>`;
+      g+=`<line x1="${x0}" x2="${x1}" y1="64" y2="64" stroke="var(--muted)"/>`;
+      for(let t=-1.6;t<=0.001;t+=0.2){const x=sx(t);g+=`<line x1="${x}" x2="${x}" y1="64" y2="70" stroke="var(--muted)"/><text x="${x}" y="86" font-size="11" text-anchor="middle" fill="var(--muted)">${t.toFixed(1)}</text>`;}
+      g+=`<text x="${x1}" y="106" font-size="11" text-anchor="end" fill="var(--muted)">volts</text>`;
+      g+=`<text x="${(sx(lo)+sx(hi))/2}" y="24" font-size="11" text-anchor="middle" fill="var(--pass)">pass window</text>`;
+      const xv=sx(v);
+      g+=`<line x1="${xv}" x2="${xv}" y1="26" y2="68" stroke="${pass?'var(--pass)':'var(--fail)'}" stroke-width="3"/><circle cx="${xv}" cy="47" r="6" fill="${pass?'var(--pass)':'var(--fail)'}"/>`;
+      svg.innerHTML=g;
+      $('cVerdict').innerHTML=pass?`<span class="verdict pass">PASS · ${v.toFixed(2)} V</span>`:`<span class="verdict fail">FAIL · ${v.toFixed(2)} V</span>`;
+      $('cRead').textContent=desc[cond]+(cond==='weak'&&pass?' Your upper limit is loose enough to let this marginal pin through; try −0.40 V.':'');
+    };
+    [...document.querySelectorAll('#cCond button')].forEach(b=>{b.type='button';b.onclick=()=>{
+      cond=b.dataset.v; document.querySelectorAll('#cCond button').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false')); draw();};});
+    ['cLo','cHi'].forEach(i=>$(i).addEventListener('input',draw)); draw();
+  }
+
+  const route=()=>{const h=location.hash.slice(1); show(lessons.some(l=>l.id===h)?h:lessons[0].id);};
+  window.addEventListener('hashchange',route); route();
+})();
+</script>
+
+</body>
+</html>
